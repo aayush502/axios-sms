@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous">
+</script>
+<!-- {% load static %} -->
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous">
+</script> -->
+<!-- <script type="javascript" src="static/js/sms_counter.min.js"></script> -->
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<form action="" method="POST">
+    {% csrf_token %}
+    <p>Your total message remaining is:{{current_user.sms_count}}</p>
+    <select type="number" class="select" name="contact_no" multiple="multiple" onclick="onlyNumbers();"> 
+    <option selected disabled>Enter the number</option>
+    <!-- {% for user in object_list %}
+    <option value = "contact_no">{{user.contact_no}}</option>
+    {% endfor %} -->
+  </select><br><br>
+
+  <input type="hidden" name="msg_count">
+  <textarea name="message" id="message"></textarea>
+  
+  <ul id="span1">
+      <span id="encoding">Encoding:GSM_7BIT</span><br>
+      <span id="length">Length: 0</span><br>
+      <span id="messages">1 message(s)</span><br>
+      <span id="per_message">Per Message:160</span><br>
+      <span id="remaining">160 characters remaining</span><br>
+  </ul>
+  
+  
+    <input type="submit" id="submit" value="submit" />
+</form>
+<script type = "text/javascript">
+function onlyNumbers(){
+  alert("Hello");
+//   $('.select').on('keypress', function () {
+//   $(this).val($(this).val().replace(/[^\d].+/, ""));
+//   if ((event.which < 10)) {
+//     event.preventDefault();
+//   }
+// })
+}
+$(document).ready(function(){
+    $("select").select2({
+          tags: true,
+        
+        //   insertTag:function(data,tag){
+          
+        //     alert (!isNaN(tag))
+            
+        //   data.push(tag)
+        //  }
+          
+          
+      });
+
+      var $remaining = $('#remaining'),
+        $messages = $remaining.next();
+
+    $('#message').keyup(function(){
+        var chars = this.value.length,
+            messages = Math.ceil(chars / 160),
+            remaining = messages * 160 - (chars % (messages * 160) || messages * 160);
+        
+        $remaining.text(remaining + ' characters remaining');
+        // $messages.text(messages + ' message(s)');
+        document.getElementById("messages").innerText=`messages: ${messages}`
+        var count = $("#message").val().length;
+        document.getElementById("length").innerText=`Length: ${count}`
+      });
+        $('submit').on('click', function(){
+        var span_data = $(this).find('messages').val();
+          $("span1").each(function() {
+            var input_id = $(this).find('span').attr('id');
+            var input_value = $(this).find('span').val();
+            span_data[input_id] = input_value;
+            console.log(span_data);
+            $.post( "log/", {data: span_data}, function( data ) {
+      // maybe show a success or fail message accordantly
+      });
+      });
+
+     
+
+//       var postUrl = "http://localhost:8000/ingredients/";
+//       $('li').click(function(){
+//         values = [1, 2];
+//         $.ajax({
+//           url: postUrl,
+//           type: 'POST',
+//           data: {'terid': values},
+//           traditional: true,
+//           dataType: 'html',
+//           success: function(result){
+//               $('#ingredients').append(result);
+//               }
+//     });       
+});
+    });
+  </script>
+
+{% endblock %}

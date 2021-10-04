@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="https://www.jqueryscript.net/demo/Character-Counter-SMS-Message/sms_counter.min.js"></script>
+<form action="" method="POST">
+    {% csrf_token %}
+    <h1> Your total message remaining is: {{current_user.sms_count}} </h1>
+    <select type="number" class="select" name="contact_no" multiple="multiple" > 
+    <!-- {% for user in object_list %}
+    <option value = "contact_no">{{user.contact_no}}</option>
+    {% endfor %} -->
+  </select><br><br>
+
+  <input type="hidden" name="message_count" id="msg_count" >
+  <textarea name="message" id="message" style="margin: 0px; width: 490px; height: 161px;"></textarea>
+  <ul id="sms-counter">
+      <li>Encoding: <span class="encoding"></span></li>
+      <li>Length: <span class="length"></span></li>
+      <li>Messages: <span class="messages"></span></li>
+      <li>Per Message: <span class="per_message"></span></li>
+      <li>Remaining: <span class="remaining"></span></li>
+    </ul>
+    
+    <input type="submit" id="submit" value="submit"  />
+</form>
+
+
+<script>
+  $(document).on("submit",'form',function(){
+    $("#msg_count").val($(".messages").html())
+  })
+  
+  $(document).ready(function(){
+    $("select").select2({
+      tags: true, 
+      placeholder: "Enter the Contact Number",
+      createTag: function(params){
+        
+        if(params.term.length !=10){
+         
+          return null;
+        }
+        return {
+            id:params.term,
+            text:params.term
+          }
+      } 
+    })
+  });
+  $('select').css({'width': 250});
+
+    $(document).on('keypress', '.select2-search__field', function () {
+    $(this).val($(this).val().replace(/[^\d].+/, ""));
+    if ((event.which < 48 || event.which > 57 )) {
+      event.preventDefault();
+    }
+
+    });       
+    $(function(){
+        $('#message').countSms('#sms-counter');
+        var getTxtValue = $(".messages").html();   
+        $("#msg_count").val(getTxtValue); 
+      });
+      
+  </script>
+
+{% endblock %}
